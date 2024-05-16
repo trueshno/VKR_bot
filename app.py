@@ -22,12 +22,10 @@ def index():
 
 @app.route("/statistics")
 def statistics():
-    # Логика обработки запроса для страницы "Статистика"
-    return render_template("statistics.html")
+    return render_template("statistics/statistics.html")
 
 @app.route("/tools")
 def tools():
-    # Логика обработки запроса для страницы "Инструменты"
     return render_template("tools/tools.html")
 
 if __name__ == '__main__':
