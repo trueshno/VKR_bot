@@ -50,3 +50,8 @@ nav a:hover {
   margin-left: 220px;
   padding: 20px;
 }
+
+.highlighted {
+  color: blue;
+  font-weight: 100;
+}
