@@ -1,3 +1,4 @@
+/* Навигационная панель */
 nav {
   width: 200px;
   background-color: #333;
@@ -53,4 +54,22 @@ nav a:hover {
 .highlighted {
   color: white;
   font-weight: 100;
+}
+
+/* Тест */
+.custom-table {
+  width: 70%;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
 }
