@@ -1,6 +1,5 @@
 <nav>
-  <img src="admin-avatar.jpg" alt="Admin Avatar" class="admin-avatar">
-  <span class="admin-title">admin</span>
+  <img src="{{ url_for('static', filename='img/admin.jpg') }}" alt="Admin Avatar" class="admin-avatar">
   <ul>
     <li><span class="highlighted">СТАТИСТИКА</span></li>
     <li><a href="#">Все пользователи</a></li>
@@ -9,6 +8,6 @@
     <li><a href="#">Пользователи за месяц</a></li>
     <li><span class="highlighted">БОТ</span></li>
     <li><a href="#">Изменить содержимое кнопок</a></li>
-    <li><a href="#">Изменить проценты начислений</a></li>
+    <li><a href="#">Добавить пост</a></li>
   </ul>
 </nav>
