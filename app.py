@@ -7,6 +7,12 @@ app = Flask(__name__)
 conn = sqlite3.connect('db/database.db', check_same_thread=False)
 cursor = conn.cursor()
 
+@app.route("/get_data", methods=["GET"])
+def get_data():
+    cursor.execute("SELECT * FROM test")
+    data = cursor.fetchall()
+    return json.dumps(data)
+
 @app.route("/")
 def statistics():
     cursor.execute("SELECT * FROM user_info")
@@ -57,7 +63,16 @@ def statistics_month():
 
 @app.route("/test")
 def test():
-    return render_template("test/test_results.html")
+    cursor.execute("SELECT * FROM test")
+    data = cursor.fetchall()
+
+    labels = []
+    histogram_data = []
+    for row in data:
+        labels.append(row[1])
+        histogram_data.append(row[0])
+
+    return render_template("test/test_results.html", data=data, labels=json.dumps(labels), histogram_data=json.dumps(histogram_data))
 
 @app.route("/tools-change")
 def tools_change():

@@ -76,18 +76,22 @@ def handle_confirmation(message, text):
         bot.reply_to(message, "Некорректный ответ. Пожалуйста, введите 'да' или 'нет'.")
 
 question_count = count()
-
+test_completed = False
 
 def get_next_question(message):
-    global question_count
+    global question_count, test_completed
 
     cursor.execute('SELECT question FROM test_questions')
     questions = cursor.fetchall()
 
     try:
-        if next(question_count) < 14:
-            return questions[next(question_count)][0]
+        question_index = next(question_count)
+        if question_index < len(questions) and question_index < 14:
+            return questions[question_index][0]
         else:
+            question_count = count()  # Сбросить счетчик вопросов
+            test_completed = True  # Установить флаг завершения теста
+
             cursor.execute("SELECT result_text, count FROM test")
             results = cursor.fetchall()
             if results:
@@ -100,31 +104,22 @@ def get_next_question(message):
                 # Увеличить счетчик для выбранного результата
                 cursor.execute("UPDATE test SET count = ? WHERE result_text = ?", (result_count + 1, result_text))
                 conn.commit()
-                # После отправки результата, начать новый опрос
-                question_count = count()
-                if next(question_count) < 14:
-                    return questions[next(question_count)][0]
     except IndexError:
-        question_count = count()
-        if next(question_count) < 14:
-            return questions[next(question_count)][0]
-        else:
-            cursor.execute("SELECT result_text, count FROM test")
-            results = cursor.fetchall()
-            if results:
-                result_text, result_count = random.choice(results)
-                if result_count is None:
-                    result_count = 0
-                bot.send_message(message.chat.id, "Ваша наиболее подходящая специальность:")
-                bot.send_message(message.chat.id, result_text)
+        question_count = count()  # Сбросить счетчик вопросов
+        test_completed = True  # Установить флаг завершения теста
 
-                # Увеличить счетчик для выбранного результата
-                cursor.execute("UPDATE test SET count = ? WHERE result_text = ?", (result_count + 1, result_text))
-                conn.commit()
-                # После отправки результата, начать новый опрос
-                question_count = count()
-                if next(question_count) < 14:
-                    return questions[next(question_count)][0]
+        cursor.execute("SELECT result_text, count FROM test")
+        results = cursor.fetchall()
+        if results:
+            result_text, result_count = random.choice(results)
+            if result_count is None:
+                result_count = 0
+            bot.send_message(message.chat.id, "Ваша наиболее подходящая специальность:")
+            bot.send_message(message.chat.id, result_text)
+
+            # Увеличить счетчик для выбранного результата
+            cursor.execute("UPDATE test SET count = ? WHERE result_text = ?", (result_count + 1, result_text))
+            conn.commit()
 
 def process_answer(message, question):
     answer = message.text
@@ -147,9 +142,8 @@ def process_answer(message, question):
     """, (message.from_user.id, question, answer))
     conn.commit()
 
-    if len(new_question) > 1:
+    if new_question is not None and len(new_question) > 1:
         bot.send_message(message.chat.id, f"{new_question}")
-
         bot.register_next_step_handler(message, process_answer, new_question)
 
 @bot.message_handler(commands=['menu'])
@@ -253,8 +247,9 @@ def get_text_messages(message):
         btn5 = types.KeyboardButton('Какая стоимость обучения?')
         btn6 = types.KeyboardButton('Схема расположения корпусов')
         btn7 = types.KeyboardButton('Другой вопрос')
+        btn8 = types.KeyboardButton('Главное меню')
 
-        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8)
         bot.send_message(message.chat.id, "Выбери интересующий тебя вопрос:", parse_mode="html", reply_markup=markup)
 
     elif message.text.lower() == "какой размер стипендии?":
@@ -289,8 +284,9 @@ def get_text_messages(message):
         btn2 = types.KeyboardButton('Специальности')
         btn3 = types.KeyboardButton('Часто задаваемые вопросы')
         btn4 = types.KeyboardButton('Проходные баллы')
+        btn5 = types.KeyboardButton('Тест на специальность')
 
-        markup.add(btn1, btn2, btn3, btn4)
+        markup.add(btn1, btn2, btn3, btn4, btn5)
         bot.send_message(message.chat.id, "Ты вернулся в главное меню", parse_mode="html", reply_markup=markup)
 
     # Отправка ответов на вопросы в соответствии с вопросами пользователя
