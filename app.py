@@ -35,13 +35,10 @@ import datetime
 
 @app.route("/statistics-week")
 def statistics_week():
-    # Получаем текущую дату
     today = datetime.date.today()
 
-    # Вычисляем дату 7 дней назад
     one_week_ago = today - datetime.timedelta(days=7)
 
-    # Формируем SQL-запрос для выборки данных за последнюю неделю
     cursor.execute("SELECT DATE(created_at) AS date, COUNT(*) AS count FROM user_info WHERE created_at >= ? GROUP BY date ORDER BY date ASC", (one_week_ago,))
     data = cursor.fetchall()
 
