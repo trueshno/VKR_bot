@@ -29,9 +29,7 @@ def statistics():
     return render_template("statistics/statistics.html", data=data, labels=json.dumps(labels),
                            histogram_data=json.dumps(histogram_data), total_users=total_users)
 
-
 import datetime
-
 
 @app.route("/statistics-week")
 def statistics_week():
@@ -44,24 +42,25 @@ def statistics_week():
 
     labels = [row[0] for row in data]
     histogram_data = [row[1] for row in data]
+    total_users = sum(row[1] for row in data)
 
     return render_template("statistics/statistics-week.html", data=data, labels=json.dumps(labels),
-                           histogram_data=json.dumps(histogram_data))
+                           histogram_data=json.dumps(histogram_data), total_users=total_users)
 
 @app.route("/statistics-month")
 def statistics_month():
-    cursor.execute("SELECT * FROM user_info")
+    today = datetime.date.today()
+
+    one_month_ago = today - datetime.timedelta(days=30)
+
+    cursor.execute("SELECT DATE(created_at) AS date, COUNT(*) AS count FROM user_info WHERE created_at >= ? GROUP BY date ORDER BY date ASC", (one_month_ago,))
     data = cursor.fetchall()
 
-    labels = []
-    histogram_data = []
-    for row in data:
-        labels.append(row[1])
-        histogram_data.append(row[0])
+    labels = [row[0] for row in data]
+    histogram_data = [row[1] for row in data]
+    total_users = sum(row[1] for row in data)
 
-    total_users = len(data)
-
-    return render_template("statistics/statistics-month.html", data=data, labels=json.dumps(labels),
+    return render_template("statistics/statistics-week.html", data=data, labels=json.dumps(labels),
                            histogram_data=json.dumps(histogram_data), total_users=total_users)
 
 @app.route("/test")

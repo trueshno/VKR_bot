@@ -6,14 +6,16 @@ from fuzzywuzzy import fuzz
 from fluzzy import answer
 from app import app
 from itertools import count
+import datetime
 
 bot = telebot.TeleBot("6620987116:AAGYKX-C3q2oMi-gY2oHc9yPVRlBRt5A1Xw")
 conn = sqlite3.connect('db/database.db', check_same_thread=False)
 cursor = conn.cursor()
 
 def db_table_val(user_id: int, user_name: str, username: str):
-    cursor.execute('INSERT OR REPLACE INTO user_info (user_id, user_name, username) VALUES (?, ?, ?)',
-                   (user_id, user_name, username))
+    created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute('INSERT OR REPLACE INTO user_info (user_id, user_name, username, created_at) VALUES (?, ?, ?, ?)',
+                   (user_id, user_name, username, created_at))
     conn.commit()
 
 @bot.message_handler(commands=['panel'])
