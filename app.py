@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import sqlite3
 import json
 
@@ -15,6 +15,10 @@ def get_data():
 
 @app.route("/")
 def statistics():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+
     query = """
         SELECT 
             u.user_name AS first_name,
@@ -23,16 +27,19 @@ def statistics():
             u.created_at
         FROM user_info u
         LEFT JOIN contacts c ON u.user_id = c.user_id
+        LIMIT ? OFFSET ?
     """
-    cursor.execute(query)
+    cursor.execute(query, (per_page, offset))
     data = cursor.fetchall()
 
-    labels = [row[2] for row in data]
-    histogram_data = [1 for _ in range(len(data))]
-    total_users = len(data)
+    total_rows = cursor.execute("SELECT COUNT(*) FROM user_info").fetchone()[0]
+    total_pages = (total_rows + per_page - 1) // per_page
 
-    return render_template("statistics/statistics.html", data=data, labels=json.dumps(labels),
-                           histogram_data=json.dumps(histogram_data), total_users=total_users)
+    # Получаем общее количество пользователей
+    total_users_query = "SELECT COUNT(*) FROM user_info"
+    total_users = cursor.execute(total_users_query).fetchone()[0]
+
+    return render_template("statistics/statistics.html", data=data, page=page, total_pages=total_pages, total_users=total_users)
 
 import datetime
 
