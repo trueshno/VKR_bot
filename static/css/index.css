@@ -103,3 +103,42 @@ nav a:hover {
     margin-left: 25px;
     width: 1050px;
 }
+
+/* Статистика пользователей */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+table.table {
+    width: 80%;
+    margin-left: 220px;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.btn-delete {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background-color: #e60000;
+}

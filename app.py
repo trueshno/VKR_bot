@@ -15,15 +15,20 @@ def get_data():
 
 @app.route("/")
 def statistics():
-    cursor.execute("SELECT * FROM user_info")
+    query = """
+        SELECT 
+            u.user_name AS first_name,
+            u.username,
+            c.phone_number,
+            u.created_at
+        FROM user_info u
+        LEFT JOIN contacts c ON u.user_id = c.user_id
+    """
+    cursor.execute(query)
     data = cursor.fetchall()
 
-    labels = []
-    histogram_data = []
-    for row in data:
-        labels.append(row[1])
-        histogram_data.append(row[0])
-
+    labels = [row[2] for row in data]
+    histogram_data = [1 for _ in range(len(data))]
     total_users = len(data)
 
     return render_template("statistics/statistics.html", data=data, labels=json.dumps(labels),
